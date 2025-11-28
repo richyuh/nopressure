@@ -6,7 +6,6 @@ import streamlit as st
 
 from ai import generate_guidance
 
-
 st.set_page_config(
     page_title="No Pressure (Blood Pressure AI Assistant)",
     page_icon="🩺",
@@ -45,7 +44,9 @@ def main() -> None:
     with st.form("bp_entry"):
         systolic = st.number_input("Systolic", min_value=80, max_value=200, value=118)
         diastolic = st.number_input("Diastolic", min_value=40, max_value=140, value=76)
-        heart_rate = st.number_input("Heart Rate", min_value=40, max_value=200, value=68)
+        heart_rate = st.number_input(
+            "Heart Rate", min_value=40, max_value=200, value=68
+        )
         symptoms = st.text_area("Symptoms / Notes", height=80, placeholder="Optional")
         timestamp = st.date_input("Reading Date", value=dt.date.today())
         submitted = st.form_submit_button("Generate Guidance", use_container_width=True)
@@ -63,7 +64,12 @@ def main() -> None:
 
     st.subheader("Recent Readings (TODO)")
     sample_data = [
-        {"Date": dt.date.today() - dt.timedelta(days=offset), "Sys": 120 - offset, "Dia": 78 - offset // 2, "HR": 70 - offset}
+        {
+            "Date": dt.date.today() - dt.timedelta(days=offset),
+            "Sys": 120 - offset,
+            "Dia": 78 - offset // 2,
+            "HR": 70 - offset,
+        }
         for offset in range(4)
     ]
     st.dataframe(sample_data, use_container_width=True, hide_index=True)
