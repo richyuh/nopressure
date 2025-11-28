@@ -15,6 +15,65 @@ st.set_page_config(
 db = PostgresDB()
 
 
+def fetch_recent_data(
+    database: PostgresDB, limit: int = 10
+) -> tuple[list[dict], Exception | None]:
+    """Return recent readings and a potential error."""
+    try:
+        return database.get_recent_readings(limit=limit), None
+    except Exception as exc:  # pragma: no cover - surface to UI
+        return [], exc
+
+
+def split_latest_previous(
+    readings: list[dict],
+) -> tuple[dict | None, dict | None]:
+    """Return the latest and previous readings from a list."""
+    latest = readings[0] if readings else None
+    previous = readings[1] if len(readings) > 1 else None
+    return latest, previous
+
+
+def format_value(reading: dict | None, key: str) -> str:
+    """Format the metric value for display."""
+    if not reading:
+        return "--"
+    return str(reading[key])
+
+
+def format_delta(latest: dict | None, previous: dict | None, key: str) -> str:
+    """Format the delta string between two readings."""
+    if not latest or not previous:
+        return "N/A"
+    delta = latest[key] - previous[key]
+    prefix = "+" if delta > 0 else ""
+    return f"{prefix}{delta} vs last"
+
+
+def render_metrics(placeholder, latest: dict | None, previous: dict | None) -> None:
+    """Render the trio of metrics with current readings."""
+    with placeholder.container():
+        col1, col2, col3 = st.columns(3)
+        col1.metric(
+            "Systolic (mmHg)",
+            format_value(latest, "sys"),
+            format_delta(latest, previous, "sys"),
+            delta_color="inverse",
+        )
+        col2.metric(
+            "Diastolic (mmHg)",
+            format_value(latest, "dia"),
+            format_delta(latest, previous, "dia"),
+            delta_color="inverse",
+        )
+        col3.metric(
+            "Heart Rate (bpm)",
+            format_value(latest, "hr"),
+            format_delta(latest, previous, "hr"),
+            delta_color="inverse",
+        )
+
+
 def main() -> None:
     """Render the Streamlit experience."""
     st.title("No Pressure (Blood Pressure AI Assistant)")
@@ -22,6 +81,11 @@ def main() -> None:
         "A lightweight starting point for building an AI copilot that tracks blood "
         "pressure readings, surfaces trends, and drafts personalized guidance."
     )
+
+    metrics_placeholder = st.empty()
+    recent_readings, load_error = fetch_recent_data(db)
+    latest_reading, previous_reading = split_latest_previous(recent_readings)
+    render_metrics(metrics_placeholder, latest_reading, previous_reading)
 
     with st.sidebar:
         st.header("Session Controls")
@@ -36,11 +100,6 @@ def main() -> None:
             "- Swap placeholder data with your own sources\n"
             "- Deploy to Streamlit Community Cloud or your infra"
         )
-
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Systolic (mmHg)", "118", "-4 vs. last")
-    col2.metric("Diastolic (mmHg)", "76", "-1 vs. last")
-    col3.metric("Heart Rate (bpm)", "68", "+3 vs. last")
 
     st.subheader("Log a Reading")
     current_time = dt.datetime.now()
@@ -72,16 +131,17 @@ def main() -> None:
                 f"{timestamp:%b %d, %Y}.",
                 icon="✅",
             )
+            recent_readings, load_error = fetch_recent_data(db)
+            latest_reading, previous_reading = split_latest_previous(recent_readings)
+            render_metrics(metrics_placeholder, latest_reading, previous_reading)
         except Exception as exc:  # pragma: no cover - surface to UI
             st.error(f"Failed to save reading: {exc}")
         else:
             st.info(guidance, icon="💡")
 
     st.subheader("Recent Readings")
-    try:
-        recent_readings = db.get_recent_readings(limit=10)
-    except Exception as exc:  # pragma: no cover - surface to UI
-        st.error(f"Unable to load readings: {exc}")
+    if load_error:
+        st.error(f"Unable to load readings: {load_error}")
         return
 
     formatted_readings = [
