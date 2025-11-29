@@ -33,6 +33,7 @@ class BPAgent:
                     "content": (
                         "You are a helpful assistant that generates guidance for "
                         "blood pressure readings. Don't end with a question."
+                        "Provide as much comprehensive guidance as possible."
                     ),
                 },
                 {

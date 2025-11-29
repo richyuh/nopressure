@@ -12,8 +12,6 @@ st.set_page_config(
     page_icon="🩺",
     layout="wide",
 )
-db = PostgresDB()
-bp_agent = BPAgent()
 
 
 def fetch_recent_data(
@@ -82,6 +80,9 @@ def main() -> None:
         "A lightweight starting point for building an AI copilot that tracks blood "
         "pressure readings, surfaces trends, and drafts personalized guidance."
     )
+
+    db = PostgresDB()
+    bp_agent = BPAgent()
 
     metrics_placeholder = st.empty()
     recent_readings, load_error = fetch_recent_data(db)
