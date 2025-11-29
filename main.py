@@ -17,6 +17,20 @@ st.set_page_config(
 )
 
 
+@st.cache_resource
+def get_database() -> PostgresDB:
+    """Initialize database connection and ensure tables exist (runs once)."""
+    db = PostgresDB()
+    db.ensure_tables_exist()
+    return db
+
+
+@st.cache_resource
+def get_bp_agent() -> BPAgent:
+    """Initialize BP agent (runs once)."""
+    return BPAgent()
+
+
 def fetch_recent_data(
     database: PostgresDB, limit: int = 10
 ) -> tuple[list[dict], Exception | None]:
@@ -84,8 +98,8 @@ def main() -> None:
         "pressure readings, surfaces trends, and drafts personalized guidance."
     )
 
-    db = PostgresDB()
-    bp_agent = BPAgent()
+    db = get_database()
+    bp_agent = get_bp_agent()
 
     metrics_placeholder = st.empty()
     recent_readings, load_error = fetch_recent_data(db)

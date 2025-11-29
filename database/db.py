@@ -27,6 +27,22 @@ class PostgresDB:
         finally:
             conn.close()
 
+    def ensure_tables_exist(self) -> None:
+        """Create tables if they don't exist (idempotent)."""
+        with self.connection() as conn, conn.cursor() as cur:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS bp_readings (
+                    id SERIAL PRIMARY KEY,
+                    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    sys INTEGER NOT NULL,
+                    dia INTEGER NOT NULL,
+                    hr INTEGER NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS idx_bp_readings_timestamp
+                    ON bp_readings(timestamp DESC);
+            """)
+            conn.commit()
+
     def insert_reading(
         self, sys: int, dia: int, hr: int, timestamp: date | datetime | None = None
     ) -> int:
