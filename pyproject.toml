@@ -7,6 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "openai>=2.8.1",
     "psycopg2-binary>=2.9.9",
+    "python-dotenv>=1.2.1",
     "resend>=2.19.0",
     "streamlit>=1.51.0",
     "watchdog>=6.0.0",

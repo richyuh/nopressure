@@ -3,9 +3,12 @@
 import datetime as dt
 
 import streamlit as st
+from dotenv import load_dotenv
 
 from agent.bp_agent import BPAgent
 from database import PostgresDB
+
+load_dotenv(".env.local")
 
 st.set_page_config(
     page_title="No Pressure (Blood Pressure AI Assistant)",

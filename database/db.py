@@ -13,31 +13,15 @@ from psycopg2.extras import RealDictCursor
 class PostgresDB:
     """Thin wrapper around a PostgreSQL connection for bp readings."""
 
-    def __init__(
-        self,
-        *,
-        dbname: str | None = None,
-        user: str | None = None,
-        password: str | None = None,
-        host: str | None = None,
-        port: str | None = None,
-    ) -> None:
-        self.dbname = dbname or "nopressure"
-        self.user = user or os.getenv("DB_USER", os.getenv("USER"))
-        self.password = password or os.getenv("DB_PASSWORD", "")
-        self.host = host or os.getenv("DB_HOST", "localhost")
-        self.port = port or os.getenv("DB_PORT", "5432")
+    def __init__(self, *, db_url: str | None = None) -> None:
+        self.db_url = db_url or os.getenv("DB_URL")
+        if not self.db_url:
+            raise ValueError("DB_URL env var (or db_url) is required")
 
     @contextmanager
     def connection(self) -> Generator[PGConnection, None, None]:
         """Yield an open psycopg2 connection that auto-closes."""
-        conn = psycopg2.connect(
-            dbname=self.dbname,
-            user=self.user,
-            password=self.password,
-            host=self.host,
-            port=self.port,
-        )
+        conn = psycopg2.connect(self.db_url)
         try:
             yield conn
         finally:
