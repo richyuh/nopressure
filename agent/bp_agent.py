@@ -15,9 +15,9 @@ class BPAgent:
         api_key: Optional[str] = None,
         model: str = "gpt-5-chat-latest",
     ) -> None:
-        self.api_key = api_key or os.getenv("PERSONAL_OAI_API_KEY")
+        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         if not self.api_key:
-            raise ValueError("PERSONAL_OAI_API_KEY env var (or api_key) is required")
+            raise ValueError("OPENAI_API_KEY env var (or api_key) is required")
         self.client = openai.OpenAI(api_key=self.api_key)
         self.model = model
 

@@ -18,7 +18,7 @@ A lightweight Streamlit app for tracking blood pressure readings, monitoring tre
 
 2. **Set up OpenAI API key**:
    ```bash
-   export PERSONAL_OAI_API_KEY=your_api_key_here
+   export OPENAI_API_KEY=your_api_key_here
    ```
 
 ## Running the App
