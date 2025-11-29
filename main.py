@@ -4,7 +4,7 @@ import datetime as dt
 
 import streamlit as st
 
-from ai import generate_guidance
+from agent.bp_agent import BPAgent
 from database import PostgresDB
 
 st.set_page_config(
@@ -13,6 +13,7 @@ st.set_page_config(
     layout="wide",
 )
 db = PostgresDB()
+bp_agent = BPAgent()
 
 
 def fetch_recent_data(
@@ -116,7 +117,9 @@ def main() -> None:
 
     if submitted:
         with st.spinner("Generating guidance..."):
-            guidance = generate_guidance(systolic, diastolic, heart_rate, symptoms)
+            guidance = bp_agent.generate_guidance(
+                systolic, diastolic, heart_rate, symptoms
+            )
 
         try:
             timestamp_value = dt.datetime.combine(timestamp, reading_time)
