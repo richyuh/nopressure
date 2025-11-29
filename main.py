@@ -113,11 +113,13 @@ def main() -> None:
             "When you're ready, press *Generate Guidance* to plug in your AI logic."
         )
         st.divider()
-        st.subheader("Next Steps")
+        st.subheader("About Your Analysis")
         st.markdown(
-            "- Connect to your LLM or rules engine\n"
-            "- Swap placeholder data with your own sources\n"
-            "- Deploy to Streamlit Community Cloud or your infra"
+            "Your AI guidance includes:\n"
+            "- Blood pressure classification\n"
+            "- Diet & exercise recommendations\n"
+            "- Sleep & stress management tips\n"
+            "- When to seek medical care"
         )
 
     st.subheader("Log a Reading")
